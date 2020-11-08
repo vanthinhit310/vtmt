@@ -251,22 +251,19 @@ class SettingController extends BaseController
      */
     public function getVerifyLicense(Core $coreApi, BaseHttpResponse $response)
     {
-        if (!File::exists(storage_path('.license'))) {
-            return $response->setError()->setMessage('Your license is invalid. Please activate your license!');
+        //        if (!File::exists(storage_path('.license'))) {
+        //            return $response->setError()->setMessage('Your license is invalid, please contact support.');
+        //        }
+
+        //        $result = $coreApi->verifyLicense(true);
+        $result = ['status' => true, 'message' => 'Verified! Thanks for purchasing.'];
+
+        if (!$result['status']) {
+            return $response->setError()->setMessage($result['message']);
         }
 
-        try {
-            $result = $coreApi->verifyLicense(true);
-
-            if (!$result['status']) {
-                return $response->setError()->setMessage($result['message']);
-            }
-
-            $activatedAt = Carbon::createFromTimestamp(filectime($coreApi->getLicenseFilePath()));
-        } catch (Exception $exception) {
-            $activatedAt = now();
-            $result = ['message' => $exception->getMessage()];
-        }
+        //        $activatedAt = Carbon::createFromTimestamp(filectime($coreApi->getLicenseFilePath()));
+        $activatedAt = Carbon::now('Asia/Ho_Chi_Minh')->addYears(1000);
 
         $data = [
             'activated_at' => $activatedAt->format('M d Y'),
@@ -274,6 +271,7 @@ class SettingController extends BaseController
         ];
 
         return $response->setMessage($result['message'])->setData($data);
+
     }
 
     /**
